@@ -35,4 +35,12 @@ resource "azurerm_kubernetes_cluster" "aks-getting-started" {
         network_plugin = "kubenet"
         load_balancer_sku = "Standard"
     }
+
+    # lifecycle {
+    #     ignore_changes  = [ 
+    #         default_node_pool
+
+    #     ]
+
+    # }
 }

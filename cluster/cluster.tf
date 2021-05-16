@@ -1,3 +1,11 @@
+data "terraform_remote_state" "k8s" {
+  backend = "local"
+  config  = {
+    path = "./terraform.tfstate"
+  }
+}
+
+
 provider "azurerm" {
   subscription_id = var.subscription_id
   client_id       = var.serviceprinciple_id
@@ -18,8 +26,18 @@ module "create_cluster" {
 
 module "k8s" {
     source                 = "../modules/k8s"
-    host                   = module.create_cluster.host
-    client_certificate     = base64decode(module.create_cluster.client_certificate)
-    client_key             = base64decode(module.create_cluster.client_key)
-    cluster_ca_certificate = base64decode(module.create_cluster.cluster_ca_certificate)
+    host                   =  data.terraform_remote_state.k8s.outputs.host
+    client_certificate     =  data.terraform_remote_state.k8s.outputs.client_certificate
+    client_key             =  data.terraform_remote_state.k8s.outputs.client_key
+    cluster_ca_certificate =  data.terraform_remote_state.k8s.outputs.cluster_ca_certificate
+
 }
+
+# module "k8s" {
+#     source                 = "../modules/k8s"
+#     host                   =  module.create_cluster.host
+#     client_certificate     =  base64decode(module.create_cluster.client_certificate)
+#     client_key             =  base64decode(module.create_cluster.client_key)
+#     cluster_ca_certificate =  base64decode(module.create_cluster.cluster_ca_certificate)
+
+# }
